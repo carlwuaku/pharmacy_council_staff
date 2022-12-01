@@ -3,12 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pharmacy_council_staff/providers/RoutineInspectionProvider.dart';
 import 'package:pharmacy_council_staff/screens/RoutineInspectionList.dart';
+import 'package:pharmacy_council_staff/screens/UserPin.dart';
 import 'package:pharmacy_council_staff/screens/addRoutineInspection.dart';
 import 'package:pharmacy_council_staff/screens/dashboard.dart';
 import 'package:pharmacy_council_staff/screens/login.dart';
+import 'package:pharmacy_council_staff/screens/welcome.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+// 2Capsulesnotabs.
+void main() async {
   runApp(const MyApp());
 }
 
@@ -31,10 +34,11 @@ class MyApp extends StatelessWidget {
           primaryColor: Colors.blue,
           textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
         ),
-        home: LoginScreen(),
+        home: Welcome(),
         routes: {
           LoginScreen.routeName: (context) => LoginScreen(),
           Dashboard.routeName: (context) => Dashboard(),
+          UserPinScreen.routeName: (context) => UserPinScreen(),
           RoutineInspectionListScreen.routeName: (context) =>
               RoutineInspectionListScreen(),
           AddRoutineInspectionScreen.routeName: (context) =>

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pharmacy_council_staff/constants.dart';
+import 'package:pharmacy_council_staff/helpers/dateHelper.dart';
 import 'package:pharmacy_council_staff/models/RIData.dart';
 import 'package:pharmacy_council_staff/models/RoutineInspectionDataModel.dart';
 import 'package:pharmacy_council_staff/models/RoutineInspectionModel.dart';
@@ -14,7 +15,6 @@ import '../styles.dart';
 
 class AddRoutineInspectionScreen extends StatefulWidget {
   static const routeName = "add_routine_inspection";
-
   @override
   State<AddRoutineInspectionScreen> createState() =>
       _AddRoutineInspectionScreenState();
@@ -22,10 +22,10 @@ class AddRoutineInspectionScreen extends StatefulWidget {
 
 class _AddRoutineInspectionScreenState
     extends State<AddRoutineInspectionScreen> {
-  RoutineInspectionModel routineInspectionModel =
-      RoutineInspectionModel(data: []);
+  late RoutineInspectionModel routineInspectionModel;
 
   List<Card> cards = [];
+  String title = "New Routine Inspection";
 
   List<RoutineInspectionDataModel> items = [];
 
@@ -34,6 +34,10 @@ class _AddRoutineInspectionScreenState
   String currentTitle = "";
 
   int currentIndex = 0;
+  DateTime selectedDate = DateTime.now();
+  TextEditingController _dateController = TextEditingController();
+  TextEditingController _lic_num_controller = TextEditingController();
+  TextEditingController _nameController = TextEditingController();
 
   // @override
   void goToPage(int page) {
@@ -49,7 +53,8 @@ class _AddRoutineInspectionScreenState
 
   List<Widget> generateCards(BuildContext context) {
     //insert the first page as the details
-
+    print("data changed. regenerating cards");
+    cards.clear();
     for (int i = 0; i < routineInspectionModel.data.length; i++) {
       RoutineInspectionDataModel field = items[i];
       // RoutineInspectionDataModel.fromJson(fieldMap[i]);
@@ -80,18 +85,17 @@ class _AddRoutineInspectionScreenState
                   options: field.options,
                   initValue: field.value,
                   valueChanged: (val) {
-                    // print(val);
-                    setState(() {
-                      field.value = val;
-                    });
-
-                    context
-                        .read<RoutineInspectionProvider>()
-                        .setData(routineInspectionModel, field, val);
-                    // print(field.toJson());
+                    print(val);
+                    field.value = val;
                     // setState(() {
-                    //
+                    //   field.value = val;
                     // });
+
+                    // context
+                    //     .read<RoutineInspectionProvider>()
+                    //     .setData(routineInspectionModel, field, val);
+                    // print(field.toJson());
+
                     // print(field.toJson());
                   })
             ],
@@ -107,6 +111,8 @@ class _AddRoutineInspectionScreenState
 
   @override
   void initState() {
+    routineInspectionModel = RoutineInspectionModel(data: []);
+
     List fieldMap = jsonDecode(dataFields);
     items = List<RoutineInspectionDataModel>.from(fieldMap.map((e) {
       return RoutineInspectionDataModel.fromJson(e);
@@ -117,8 +123,30 @@ class _AddRoutineInspectionScreenState
   }
 
   @override
+  void didChangeDependencies() {
+    try {
+      final argument =
+          ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+      //if the id was passed, get the previous content and prepopulate for editing
+      int id = argument['id'];
+      RoutineInspectionProvider().getSingleItem(id).then((value) {
+        setState(() {
+          routineInspectionModel = value;
+          generateCards(context);
+        });
+      }, onError: (error) {
+        print(error);
+      });
+    } catch (e) {
+      print(e);
+      //go back to previous
+
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    //use the data object to create the card content
+    //use the data object to create the card contentp
 
     return Scaffold(
       appBar: AppBar(
@@ -142,33 +170,10 @@ class _AddRoutineInspectionScreenState
                       height: 15,
                     ),
                     TextField(
+                      controller: _lic_num_controller,
                       decoration: kTextFieldDecorator,
                       onChanged: (val) {
                         routineInspectionModel.license_number = val;
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Card(
-              child: Padding(
-                padding: cardPadding,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Date of Inspection",
-                      style: cardTitleStyle,
-                    ),
-                    SizedBox(
-                      height: 15,
-                    ),
-                    TextField(
-                      decoration:
-                          kTextFieldDecorator.copyWith(hintText: "YYYY-MM-DD"),
-                      onChanged: (val) {
-                        routineInspectionModel.date = val;
                       },
                     ),
                   ],
@@ -189,10 +194,83 @@ class _AddRoutineInspectionScreenState
                       height: 15,
                     ),
                     TextField(
+                      controller: _nameController,
                       decoration: kTextFieldDecorator,
                       onChanged: (val) {
                         routineInspectionModel.name = val;
                       },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Card(
+              child: Padding(
+                padding: cardPadding,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Date of Inspection",
+                      style: cardTitleStyle,
+                    ),
+                    SizedBox(
+                      height: 15,
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                            child: routineInspectionModel.date == ""
+                                ? Text("Tap the icon to pick a date")
+                                : Text(routineInspectionModel.date)
+                            // TextField(
+                            //     decoration: kTextFieldDecorator.copyWith(
+                            //         hintText: "YYYY-MM-DD"),
+                            //     controller: _dateController,
+                            //     onChanged: (val) {
+                            //       routineInspectionModel.date = val;
+                            //     },
+                            //     onTap: () async {
+                            //       final DateTime? _selected =
+                            //           await showDatePicker(
+                            //               context: context,
+                            //               initialDate: selectedDate,
+                            //               firstDate: DateTime(2010),
+                            //               lastDate: DateTime(2025),
+                            //               fieldHintText: "YYYY-MM-DD",
+                            //               helpText: "Enter Inspection Date",
+                            //               initialEntryMode:
+                            //                   DatePickerEntryMode.input);
+                            //       if (_selected != null) {
+                            //         setState(() {
+                            //           routineInspectionModel.date =
+                            //               _selected.toString();
+                            //           _dateController.text =
+                            //               DateHelper.formatDate(_selected);
+                            //         });
+                            //       }
+                            //     }),
+                            ),
+                        IconButton(
+                            onPressed: () async {
+                              //add date picker here
+                              final DateTime? _selected = await showDatePicker(
+                                context: context,
+                                initialDate: selectedDate,
+                                firstDate: DateTime(2010),
+                                lastDate: DateTime(2025),
+                              );
+                              if (_selected != null) {
+                                setState(() {
+                                  routineInspectionModel.date =
+                                      _selected.toString();
+                                  _dateController.text =
+                                      DateHelper.formatDate(_selected);
+                                });
+                              }
+                            },
+                            icon: Icon(Icons.calendar_today))
+                      ],
                     ),
                   ],
                 ),
@@ -203,7 +281,7 @@ class _AddRoutineInspectionScreenState
               height: 30,
             ),
             ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   context
                       .read<RoutineInspectionProvider>()
                       .addInspection(routineInspectionModel);
@@ -211,7 +289,7 @@ class _AddRoutineInspectionScreenState
                   Navigator.pop(context);
                 },
                 child: Text(
-                  "Add",
+                  "Save",
                   style: TextStyle(fontSize: 15),
                 ))
           ],

@@ -1,19 +1,31 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pharmacy_council_staff/models/RoutineInspectionModel.dart';
-import 'package:pharmacy_council_staff/screens/RoutineInspectionDetails.dart';
 
 class RoutineInspectionTile extends StatelessWidget {
   final RoutineInspectionModel routineInspectionModel;
   final Function longPressCallback;
+  final Function itemPressedCallback;
+  final bool isSelected;
   const RoutineInspectionTile(
-      {required this.routineInspectionModel, required this.longPressCallback});
+      {required this.routineInspectionModel,
+      required this.longPressCallback,
+      required this.itemPressedCallback,
+      this.isSelected = false});
   @override
   Widget build(BuildContext context) {
+    final selectedColor = Theme.of(context).primaryColor;
+    final style = isSelected
+        ? TextStyle(color: selectedColor, fontWeight: FontWeight.bold)
+        : TextStyle();
     return ListTile(
-      title: Text(routineInspectionModel.name),
+      title: Text(
+        routineInspectionModel.name,
+        style: style,
+      ),
       subtitle: Row(
         children: [
-          Text(routineInspectionModel.license_number),
+          Expanded(child: Text(routineInspectionModel.license_number)),
           SizedBox(
             width: 10,
           ),
@@ -21,19 +33,23 @@ class RoutineInspectionTile extends StatelessWidget {
           SizedBox(
             width: 5,
           ),
-          Text(routineInspectionModel.date)
+          Expanded(
+            child: Text(
+              routineInspectionModel.date,
+            ),
+          )
         ],
       ),
-      trailing: Icon(Icons.spellcheck),
+      trailing: isSelected
+          ? Icon(
+              Icons.check,
+              color: Theme.of(context).primaryColor,
+            )
+          : null,
       onLongPress: () {
-        longPressCallback();
+        longPressCallback(routineInspectionModel);
       },
-      onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return RoutineInspectionDetailsScreen(
-              routineInspectionModel: routineInspectionModel);
-        }));
-      },
+      onTap: () => itemPressedCallback(routineInspectionModel),
     );
   }
 }

@@ -4,6 +4,8 @@ import 'package:pharmacy_council_staff/models/RoutineInspectionDataModel.dart';
 import 'package:pharmacy_council_staff/models/RoutineInspectionModel.dart';
 import 'package:pharmacy_council_staff/styles.dart';
 
+import 'addRoutineInspection.dart';
+
 class RoutineInspectionDetailsScreen extends StatelessWidget {
   final RoutineInspectionModel routineInspectionModel;
 
@@ -29,6 +31,33 @@ class RoutineInspectionDetailsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("Inspection Details"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.share),
+            tooltip: 'Share',
+            onPressed: () {
+              // handle the press
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.edit),
+            tooltip: 'Edit',
+            onPressed: () {
+              // navigate to the form and edit it
+              final edited = Navigator.pushNamed(
+                  context, AddRoutineInspectionScreen.routeName,
+                  arguments: {'id': routineInspectionModel.id});
+              print(edited);
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete),
+            tooltip: 'Delete',
+            onPressed: () {
+              // handle the press
+            },
+          ),
+        ],
       ),
       body: ListView(
         children: [

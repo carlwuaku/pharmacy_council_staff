@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart';
 
 const kAppTitle = "Pharmacy Council";
+const kUserIdKey = "USER_ID";
+const kUserNameKey = "USERNAME";
+const kUserDisplayName = "USER_DISPLAY_NAME";
 const kTextFieldBorderRadius = 2.0;
-
+const kUserPin = "USER_PIN";
+const kHeroLogoTag = 'logo';
+const kBackgroundColor = Colors.lightBlueAccent;
+const kLogoHeight = 200.0;
+const kErrorTextStyle =
+    TextStyle(color: Colors.red, fontStyle: FontStyle.italic);
 const kShadowText = TextStyle(shadows: [
   Shadow(color: Colors.black38, blurRadius: 2, offset: Offset(1, 1))
 ], color: Colors.white, fontSize: 25);
+
+const highlightedTextStyle = TextStyle(color: Colors.blue);
 
 const kTextFieldDecorator = InputDecoration(
   hintText: '',
@@ -22,3 +32,8 @@ const kTextFieldDecorator = InputDecoration(
     // borderRadius: BorderRadius.all(Radius.circular(32.0)),
   ),
 );
+
+String cpid = "";
+const kPinSetMessage = "PIN set successfully";
+const kPinWrong = "The PIN entered is incorrect. Please try again";
+const kEnterPinText = "Enter your PIN";
